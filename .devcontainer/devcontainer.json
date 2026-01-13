@@ -14,12 +14,6 @@
       // Set *default* container specific settings.json values on container create
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": false,
-        "python.linting.ruffEnabled": true,
-        "python.formatting.provider": "black",
-        "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
-        "python.linting.ruffPath": "/usr/local/py-utils/bin/ruff",
         "python.analysis.typeCheckingMode": "basic",
         "python.analysis.autoImportCompletions": true,
         "editor.formatOnSave": true,
@@ -76,8 +70,7 @@
 
   // Mounts for persistent storage and configuration
   "mounts": [
-    "source=${localEnv:HOME}/.config,target=/home/vscode/.config,type=bind,consistency=cached",
-    "source=${localWorkspaceFolder}/.password_saver,target=/home/vscode/.password_saver,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.config,target=/home/vscode/.config,type=bind,consistency=cached"
   ],
 
   // Lifecycle scripts
