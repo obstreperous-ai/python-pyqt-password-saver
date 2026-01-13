@@ -1,2 +1,112 @@
 # python-pyqt-password-saver
-An experimental password saver in Python and PyQT
+
+A secure, cross-platform desktop password manager built with PyQt6 and Python 3.12.
+
+## Features
+
+- 🔐 **AES-256 Encryption**: All passwords are encrypted using industry-standard AES-256-CBC encryption
+- 🔑 **Master Password**: Single master password to access your password vault
+- 💾 **Local Storage**: Passwords stored locally in encrypted format
+- 🖥️ **Cross-Platform**: Works on macOS and Linux
+- 🔒 **OS Keyring Integration**: Uses OS secure storage when available, with file-based fallback
+- 🎨 **User-Friendly GUI**: Clean PyQt6 interface for easy password management
+
+## Requirements
+
+- Python 3.12 or higher
+- PyQt6
+- cryptography library
+- keyring library
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/obstreperous-ai/python-pyqt-password-saver.git
+cd python-pyqt-password-saver
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+Run the application:
+```bash
+python main.py
+```
+
+On first launch, you'll be prompted to create a master password. This password will be used to encrypt and decrypt your password vault.
+
+### Adding a Password
+
+1. Click "Add Password" button
+2. Enter the service name (e.g., "github.com")
+3. Enter your username
+4. Enter your password
+5. Optionally add notes
+6. Click "Save"
+
+### Viewing a Password
+
+1. Select a service from the list
+2. Click "View Password" or double-click the service
+3. Click "Show" to reveal the password
+4. Password is copyable for easy use
+
+### Deleting a Password
+
+1. Select a service from the list
+2. Click "Delete Password"
+3. Confirm deletion
+
+## Project Structure
+
+```
+python-pyqt-password-saver/
+├── main.py              # Application entry point and GUI logic
+├── storage.py           # Encrypted storage and cryptography logic
+├── ui/
+│   └── mainwindow.ui   # PyQt6 UI definition file
+├── requirements.txt     # Python dependencies
+├── pyproject.toml      # Project configuration and metadata
+├── README.md           # This file
+└── LICENSE             # MIT License
+```
+
+## Security
+
+- Passwords are encrypted using AES-256-CBC with PBKDF2 key derivation
+- 100,000 PBKDF2 iterations for key strengthening
+- Random salt and IV for each encryption operation
+- Master password never stored, only derived key
+- Salt stored in OS keyring when available, otherwise in `.password_saver/.salt`
+- Encrypted passwords stored in `~/.password_saver/passwords.enc`
+
+## Development
+
+### Configuration
+
+Project uses `pyproject.toml` for configuration with support for:
+- Black code formatter
+- Ruff linter
+- mypy type checker
+
+### Dependencies
+
+Core dependencies:
+- `PyQt6>=6.6.0` - GUI framework
+- `cryptography>=41.0.0` - Encryption library
+- `keyring>=24.0.0` - OS keyring integration
+- `PySide6>=6.6.0` - Optional fallback UI framework
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+

@@ -9,7 +9,7 @@ from typing import Any, Optional
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import keyring
 
 
@@ -40,18 +40,32 @@ class PasswordStorage:
         Args:
             password: Master password to derive encryption key from
         """
-        # Try to get existing salt from keyring
-        stored_salt = keyring.get_password(self.SERVICE_NAME, "salt")
+        # Try to get existing salt from keyring or fallback to file
+        stored_salt = None
+        salt_file = self.data_dir / ".salt"
+        
+        try:
+            stored_salt = keyring.get_password(self.SERVICE_NAME, "salt")
+        except Exception:
+            # Keyring not available, use file-based storage
+            if salt_file.exists():
+                stored_salt = salt_file.read_text()
         
         if stored_salt:
             salt = base64.b64decode(stored_salt)
         else:
             # Generate new salt and store it
             salt = os.urandom(16)
-            keyring.set_password(self.SERVICE_NAME, "salt", base64.b64encode(salt).decode())
+            encoded_salt = base64.b64encode(salt).decode()
+            
+            try:
+                keyring.set_password(self.SERVICE_NAME, "salt", encoded_salt)
+            except Exception:
+                # Keyring not available, use file-based storage
+                salt_file.write_text(encoded_salt)
         
         # Derive key from password using PBKDF2
-        kdf = PBKDF2(
+        kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
             salt=salt,
