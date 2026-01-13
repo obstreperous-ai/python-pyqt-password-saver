@@ -54,8 +54,12 @@
   "remoteUser": "vscode",
 
   // Set environment variables for the container
-  // Note: QT_QPA_PLATFORM=offscreen allows PyQt apps to run without display
-  // For X11 forwarding to view GUI, change to "xcb" and set DISPLAY appropriately
+  // Note: QT_QPA_PLATFORM=offscreen allows PyQt apps to run in headless mode without display
+  // This is suitable for development, testing, and running the app programmatically
+  // To view the GUI during development:
+  //   1. Change "offscreen" to "xcb" 
+  //   2. Add "DISPLAY": ":0" to remoteEnv
+  //   3. Ensure X11 forwarding is configured on your host
   "remoteEnv": {
     "QT_QPA_PLATFORM": "offscreen",
     "PYTHONUNBUFFERED": "1"
