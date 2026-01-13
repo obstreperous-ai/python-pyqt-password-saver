@@ -1,0 +1,7 @@
+# Core dependencies for Password Saver Application
+PyQt6>=6.6.0
+cryptography>=41.0.0
+keyring>=24.0.0
+
+# Optional fallback UI framework (not currently used in code)
+# PySide6>=6.6.0
