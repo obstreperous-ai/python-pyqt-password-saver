@@ -50,9 +50,6 @@
   // PyQt6 applications typically don't need port forwarding unless running a web server
   "forwardPorts": [],
 
-  // Use 'postCreateCommand' to run commands after the container is created
-  "postCreateCommand": "pip install -r requirements.txt && pip install black ruff mypy",
-
   // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root
   "remoteUser": "vscode",
 
@@ -70,6 +67,7 @@
   ],
 
   // Lifecycle scripts
-  "onCreateCommand": "pip install --upgrade pip && echo 'Container created for Python PyQt Password Saver development'",
+  "onCreateCommand": "pip install --upgrade pip",
+  "postCreateCommand": "pip install -r requirements.txt && pip install black ruff mypy && echo 'Python PyQt Password Saver development environment ready'",
   "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"
 }
