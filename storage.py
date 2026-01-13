@@ -132,8 +132,17 @@ class PasswordStorage:
         padded_data = decryptor.update(ciphertext) + decryptor.finalize()
         
         # Validate and remove padding
+        if len(padded_data) == 0:
+            raise ValueError("Invalid encrypted data: empty")
+        
         padding_length = padded_data[-1]
+        
+        # Check padding length is valid (1-16 for AES block size)
         if padding_length > 16 or padding_length == 0:
+            raise ValueError("Invalid padding")
+        
+        # Check we have enough bytes for the padding
+        if len(padded_data) < padding_length:
             raise ValueError("Invalid padding")
         
         # Verify all padding bytes are correct

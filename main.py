@@ -195,6 +195,8 @@ class MainWindow(QMainWindow):
     def _load_ui(self) -> None:
         """Load the UI from .ui file."""
         ui_file = Path(__file__).parent / "ui" / "mainwindow.ui"
+        if not ui_file.exists():
+            raise FileNotFoundError(f"UI file not found: {ui_file}")
         uic.loadUi(ui_file, self)
 
     def _connect_signals(self) -> None:
@@ -341,14 +343,22 @@ class MainWindow(QMainWindow):
 
 def main() -> None:
     """Main entry point for the application."""
-    app = QApplication(sys.argv)
-    app.setApplicationName("Password Saver")
-    app.setOrganizationName("PyQt Password Saver")
-    
-    window = MainWindow()
-    window.show()
-    
-    sys.exit(app.exec())
+    try:
+        app = QApplication(sys.argv)
+        app.setApplicationName("Password Saver")
+        app.setOrganizationName("PyQt Password Saver")
+        
+        window = MainWindow()
+        window.show()
+        
+        sys.exit(app.exec())
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        print("Make sure all required files are present in the installation directory.", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Fatal error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
