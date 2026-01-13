@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import keyring
+from keyring.errors import KeyringError
 
 
 class PasswordStorage:
@@ -46,7 +47,7 @@ class PasswordStorage:
         
         try:
             stored_salt = keyring.get_password(self.SERVICE_NAME, "salt")
-        except Exception:
+        except (KeyringError, RuntimeError):
             # Keyring not available, use file-based storage
             if salt_file.exists():
                 stored_salt = salt_file.read_text()
@@ -60,7 +61,7 @@ class PasswordStorage:
             
             try:
                 keyring.set_password(self.SERVICE_NAME, "salt", encoded_salt)
-            except Exception:
+            except (KeyringError, RuntimeError):
                 # Keyring not available, use file-based storage
                 salt_file.write_text(encoded_salt)
         
@@ -130,8 +131,16 @@ class PasswordStorage:
         decryptor = cipher.decryptor()
         padded_data = decryptor.update(ciphertext) + decryptor.finalize()
         
-        # Remove padding
+        # Validate and remove padding
         padding_length = padded_data[-1]
+        if padding_length > 16 or padding_length == 0:
+            raise ValueError("Invalid padding")
+        
+        # Verify all padding bytes are correct
+        for i in range(padding_length):
+            if padded_data[-(i + 1)] != padding_length:
+                raise ValueError("Invalid padding")
+        
         data = padded_data[:-padding_length]
         
         return data
@@ -165,7 +174,7 @@ class PasswordStorage:
             
             # Parse JSON
             return json.loads(decrypted_data.decode())
-        except Exception as e:
+        except (ValueError, json.JSONDecodeError, OSError) as e:
             raise ValueError(f"Failed to load passwords: {e}")
     
     def add_password(

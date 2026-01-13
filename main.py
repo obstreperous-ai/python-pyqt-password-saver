@@ -221,12 +221,18 @@ class MainWindow(QMainWindow):
                         self.storage.load_passwords()
                         self.statusbar.showMessage("Password manager unlocked", 3000)
                         break
-                    except Exception as e:
+                    except ValueError as e:
                         QMessageBox.critical(
                             self,
                             "Error",
                             f"Failed to unlock password manager: {e}\n\n"
                             "If this is your first time, any password will create a new vault.",
+                        )
+                    except (OSError, IOError) as e:
+                        QMessageBox.critical(
+                            self,
+                            "Error",
+                            f"Failed to access password storage: {e}",
                         )
                 else:
                     QMessageBox.warning(self, "Warning", "Master password cannot be empty")
@@ -262,8 +268,10 @@ class MainWindow(QMainWindow):
                 QMessageBox.information(
                     self, "Success", f"Password for '{service}' saved successfully"
                 )
-            except Exception as e:
+            except ValueError as e:
                 QMessageBox.critical(self, "Error", f"Failed to save password: {e}")
+            except (OSError, IOError) as e:
+                QMessageBox.critical(self, "Error", f"Failed to write password file: {e}")
 
     def _view_password(self) -> None:
         """View the selected password."""
@@ -280,8 +288,10 @@ class MainWindow(QMainWindow):
                 dialog.exec()
             else:
                 QMessageBox.warning(self, "Warning", f"Password for '{service}' not found")
-        except Exception as e:
+        except ValueError as e:
             QMessageBox.critical(self, "Error", f"Failed to load password: {e}")
+        except (OSError, IOError) as e:
+            QMessageBox.critical(self, "Error", f"Failed to read password file: {e}")
 
     def _delete_password(self) -> None:
         """Delete the selected password."""
@@ -307,8 +317,10 @@ class MainWindow(QMainWindow):
                     )
                 else:
                     QMessageBox.warning(self, "Warning", f"Password for '{service}' not found")
-            except Exception as e:
+            except ValueError as e:
                 QMessageBox.critical(self, "Error", f"Failed to delete password: {e}")
+            except (OSError, IOError) as e:
+                QMessageBox.critical(self, "Error", f"Failed to update password file: {e}")
 
     def _show_about(self) -> None:
         """Show about dialog."""
