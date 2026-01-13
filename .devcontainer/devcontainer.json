@@ -51,12 +51,14 @@
   "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created
-  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && pip install -e .[dev]",
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && pip install black ruff mypy",
 
   // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root
   "remoteUser": "vscode",
 
   // Set environment variables for the container
+  // Note: QT_QPA_PLATFORM=offscreen allows PyQt apps to run without display
+  // For X11 forwarding, change to "xcb" or remove this setting
   "remoteEnv": {
     "DISPLAY": ":0",
     "QT_QPA_PLATFORM": "offscreen",
@@ -66,11 +68,6 @@
   // Configure container for GUI applications (X11 forwarding for PyQt)
   "runArgs": [
     "--security-opt=seccomp=unconfined"
-  ],
-
-  // Mounts for persistent storage and configuration
-  "mounts": [
-    "source=${localEnv:HOME}/.config,target=/home/vscode/.config,type=bind,consistency=cached"
   ],
 
   // Lifecycle scripts
