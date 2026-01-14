@@ -147,17 +147,17 @@ class ViewPasswordDialog(QDialog):
         self.password_label = QLabel("********")
         self.password_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         password_layout.addWidget(self.password_label)
-        
+
         self.show_button = QPushButton("Show")
-        self.show_button.clicked.connect(lambda: self._toggle_password(data.get('password', '')))
+        self.show_button.clicked.connect(lambda: self._toggle_password(data.get("password", "")))
         password_layout.addWidget(self.show_button)
         layout.addLayout(password_layout)
 
         # Notes
-        if data.get('notes'):
+        if data.get("notes"):
             layout.addWidget(QLabel("<b>Notes:</b>"))
             notes_display = QTextEdit()
-            notes_display.setPlainText(data['notes'])
+            notes_display.setPlainText(data["notes"])
             notes_display.setReadOnly(True)
             notes_display.setMaximumHeight(100)
             layout.addWidget(notes_display)
@@ -257,11 +257,9 @@ class MainWindow(QMainWindow):
         dialog = AddPasswordDialog(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             service, username, password, notes = dialog.get_data()
-            
+
             if not service or not username or not password:
-                QMessageBox.warning(
-                    self, "Warning", "Service, username, and password are required"
-                )
+                QMessageBox.warning(self, "Warning", "Service, username, and password are required")
                 return
 
             try:
@@ -347,14 +345,17 @@ def main() -> None:
         app = QApplication(sys.argv)
         app.setApplicationName("Password Saver")
         app.setOrganizationName("PyQt Password Saver")
-        
+
         window = MainWindow()
         window.show()
-        
+
         sys.exit(app.exec())
     except FileNotFoundError as e:
         print(f"Error: {e}", file=sys.stderr)
-        print("Make sure all required files are present in the installation directory.", file=sys.stderr)
+        print(
+            "Make sure all required files are present in the installation directory.",
+            file=sys.stderr,
+        )
         sys.exit(1)
     except Exception as e:
         print(f"Fatal error: {e}", file=sys.stderr)
