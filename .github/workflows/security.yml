@@ -46,8 +46,8 @@ jobs:
     - name: Run Bandit (security linter)
       run: |
         pip install bandit
-        bandit -r *.py -f json -o bandit-report.json || true
-        bandit -r *.py || true
+        bandit -r . -f json -o bandit-report.json || true
+        bandit -r . || true
     
     - name: Upload Bandit report
       if: always()

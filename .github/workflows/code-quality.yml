@@ -29,11 +29,11 @@ jobs:
     
     - name: Run Black (formatting check)
       run: |
-        black --check --diff --color *.py
+        black --check --diff --color .
     
     - name: Run Ruff (fast linter)
       run: |
-        ruff check *.py
+        ruff check .
     
     - name: Run Pylint
       run: |
@@ -41,13 +41,13 @@ jobs:
           --disable=C0111,C0103,R0903,R0913,W0212,C0301,R0902,R0914,R1702,C0302 \
           --max-line-length=100 \
           --good-names=i,j,k,ex,Run,_,x,y,app,ui \
-          *.py || echo "Pylint found issues but continuing"
+          --recursive=y . || echo "Pylint found issues but continuing"
     
     - name: Run MyPy (type checking)
       run: |
-        mypy --ignore-missing-imports --no-strict-optional *.py || echo "MyPy found issues but continuing"
+        mypy --ignore-missing-imports --no-strict-optional . || echo "MyPy found issues but continuing"
     
     - name: Check for common security issues
       run: |
         pip install bandit
-        bandit -r *.py -ll || echo "Bandit found issues but continuing"
+        bandit -r . -ll || echo "Bandit found issues but continuing"
