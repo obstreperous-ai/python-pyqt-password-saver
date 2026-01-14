@@ -102,6 +102,36 @@ Core dependencies:
 - `keyring>=24.0.0` - OS keyring integration
 - `PySide6>=6.6.0` - Optional fallback UI framework
 
+### CI/CD Workflows
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+#### Build and Test (`build-test.yml`)
+- Runs on: Push and Pull Requests to `main` and `develop`
+- Platforms: Ubuntu and macOS
+- Features:
+  - Cross-platform PyQt6 compatibility testing
+  - Platform-specific system dependencies
+  - Headless GUI testing with Xvfb on Linux
+  - Package build validation
+
+#### Code Quality (`code-quality.yml`)
+- Runs on: Push and Pull Requests
+- Tools: Black, Ruff, Pylint, MyPy, Bandit
+- Ensures code formatting, quality, and type safety
+
+#### Security Scanning (`security.yml`)
+- Runs on: Push, Pull Requests, and weekly schedule
+- Tools: pip-audit, Bandit, detect-secrets
+- Checks for vulnerabilities and security issues
+
+#### Release (`release.yml`)
+- Triggers on: Version tags (e.g., `v0.1.1`)
+- Creates: 
+  - Python packages (wheel and source)
+  - Platform-specific binaries (macOS, Linux)
+  - GitHub Release with all artifacts
+
 ## License
 
 MIT License - see LICENSE file for details
