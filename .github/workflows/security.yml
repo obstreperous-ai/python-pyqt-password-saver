@@ -32,8 +32,9 @@ jobs:
     
     - name: Run pip-audit (vulnerability scan)
       run: |
-        pip-audit --desc --format json -o pip-audit-report.json || true
-        pip-audit --desc || true
+        pip-audit --desc | tee pip-audit-output.txt
+        pip-audit --desc --format json -o pip-audit-report.json
+      continue-on-error: true
     
     - name: Upload pip-audit report
       if: always()
@@ -46,8 +47,9 @@ jobs:
     - name: Run Bandit (security linter)
       run: |
         pip install bandit
-        bandit -r . -f json -o bandit-report.json || true
-        bandit -r . || true
+        bandit -r . | tee bandit-output.txt
+        bandit -r . -f json -o bandit-report.json
+      continue-on-error: true
     
     - name: Upload Bandit report
       if: always()

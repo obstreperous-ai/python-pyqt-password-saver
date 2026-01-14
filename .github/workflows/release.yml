@@ -73,7 +73,7 @@ jobs:
       run: |
         pyinstaller --name PasswordSaver \
           --windowed \
-          --onefile \
+          --onedir \
           --add-data "ui:ui" \
           main.py
     
@@ -81,7 +81,11 @@ jobs:
       run: |
         # Create a simple zip for macOS distribution
         cd dist
-        zip -r PasswordSaver-macOS-${{ github.ref_name }}.zip PasswordSaver.app
+        if [ -d "PasswordSaver.app" ]; then
+          zip -r PasswordSaver-macOS-${{ github.ref_name }}.zip PasswordSaver.app
+        elif [ -f "PasswordSaver" ]; then
+          zip PasswordSaver-macOS-${{ github.ref_name }}.zip PasswordSaver
+        fi
         cd ..
       continue-on-error: true
     

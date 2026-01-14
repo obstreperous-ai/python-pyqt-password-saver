@@ -54,7 +54,8 @@ jobs:
       run: |
         # PyQt6 dependencies are usually bundled on macOS
         # Ensure we have required system libraries
-        brew list qt6 || brew install qt6 || true
+        brew list qt6 || brew install qt6
+      continue-on-error: true
     
     - name: Install Python dependencies
       run: |
