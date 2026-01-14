@@ -2,23 +2,21 @@
 
 import sys
 from pathlib import Path
-from typing import Optional
 
 from PyQt6 import uic
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QApplication,
-    QMainWindow,
     QDialog,
-    QVBoxLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMainWindow,
+    QMessageBox,
     QPushButton,
     QTextEdit,
-    QMessageBox,
-    QInputDialog,
+    QVBoxLayout,
 )
-from PyQt6.QtCore import Qt
 
 from storage import PasswordStorage
 
@@ -26,7 +24,7 @@ from storage import PasswordStorage
 class MasterPasswordDialog(QDialog):
     """Dialog for entering the master password."""
 
-    def __init__(self, parent: Optional[QMainWindow] = None):
+    def __init__(self, parent: QMainWindow | None = None):
         super().__init__(parent)
         self.setWindowTitle("Master Password")
         self.setModal(True)
@@ -68,7 +66,7 @@ class MasterPasswordDialog(QDialog):
 class AddPasswordDialog(QDialog):
     """Dialog for adding a new password."""
 
-    def __init__(self, parent: Optional[QMainWindow] = None):
+    def __init__(self, parent: QMainWindow | None = None):
         super().__init__(parent)
         self.setWindowTitle("Add Password")
         self.setModal(True)
@@ -125,7 +123,7 @@ class AddPasswordDialog(QDialog):
 class ViewPasswordDialog(QDialog):
     """Dialog for viewing password details."""
 
-    def __init__(self, service: str, data: dict, parent: Optional[QMainWindow] = None):
+    def __init__(self, service: str, data: dict, parent: QMainWindow | None = None):
         super().__init__(parent)
         self.setWindowTitle(f"Password Details - {service}")
         self.setModal(True)
@@ -186,7 +184,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.storage: Optional[PasswordStorage] = None
+        self.storage: PasswordStorage | None = None
         self._load_ui()
         self._connect_signals()
         self._initialize_storage()
@@ -230,7 +228,7 @@ class MainWindow(QMainWindow):
                             f"Failed to unlock password manager: {e}\n\n"
                             "If this is your first time, any password will create a new vault.",
                         )
-                    except (OSError, IOError) as e:
+                    except OSError as e:
                         QMessageBox.critical(
                             self,
                             "Error",
@@ -270,7 +268,7 @@ class MainWindow(QMainWindow):
                 )
             except ValueError as e:
                 QMessageBox.critical(self, "Error", f"Failed to save password: {e}")
-            except (OSError, IOError) as e:
+            except OSError as e:
                 QMessageBox.critical(self, "Error", f"Failed to write password file: {e}")
 
     def _view_password(self) -> None:
@@ -290,7 +288,7 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Warning", f"Password for '{service}' not found")
         except ValueError as e:
             QMessageBox.critical(self, "Error", f"Failed to load password: {e}")
-        except (OSError, IOError) as e:
+        except OSError as e:
             QMessageBox.critical(self, "Error", f"Failed to read password file: {e}")
 
     def _delete_password(self) -> None:
@@ -319,7 +317,7 @@ class MainWindow(QMainWindow):
                     QMessageBox.warning(self, "Warning", f"Password for '{service}' not found")
             except ValueError as e:
                 QMessageBox.critical(self, "Error", f"Failed to delete password: {e}")
-            except (OSError, IOError) as e:
+            except OSError as e:
                 QMessageBox.critical(self, "Error", f"Failed to update password file: {e}")
 
     def _show_about(self) -> None:

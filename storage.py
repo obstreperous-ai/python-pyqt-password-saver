@@ -4,13 +4,13 @@ import base64
 import json
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
+import keyring
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-import keyring
 from keyring.errors import KeyringError
 
 
@@ -20,7 +20,7 @@ class PasswordStorage:
     SERVICE_NAME = "PyQtPasswordSaver"
     MASTER_KEY_ID = "master_encryption_key"
 
-    def __init__(self, data_dir: Optional[Path] = None):
+    def __init__(self, data_dir: Path | None = None):
         """Initialize password storage.
 
         Args:
@@ -33,7 +33,7 @@ class PasswordStorage:
         self.data_dir = data_dir
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.data_file = self.data_dir / "passwords.enc"
-        self._master_key: Optional[bytes] = None
+        self._master_key: bytes | None = None
 
     def initialize_master_key(self, password: str) -> None:
         """Initialize or retrieve the master encryption key.
@@ -176,7 +176,7 @@ class PasswordStorage:
             # Parse JSON
             return json.loads(decrypted_data.decode())
         except (ValueError, json.JSONDecodeError, OSError) as e:
-            raise ValueError(f"Failed to load passwords: {e}")
+            raise ValueError(f"Failed to load passwords: {e}") from e
 
     def add_password(self, service: str, username: str, password: str, notes: str = "") -> None:
         """Add or update a password entry.
@@ -191,7 +191,7 @@ class PasswordStorage:
         passwords[service] = {"username": username, "password": password, "notes": notes}
         self.save_passwords(passwords)
 
-    def get_password(self, service: str) -> Optional[dict[str, Any]]:
+    def get_password(self, service: str) -> dict[str, Any] | None:
         """Retrieve password entry for a service.
 
         Args:
