@@ -2,23 +2,21 @@
 
 import sys
 from pathlib import Path
-from typing import Optional
 
 from PyQt6 import uic
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QApplication,
-    QMainWindow,
     QDialog,
-    QVBoxLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMainWindow,
+    QMessageBox,
     QPushButton,
     QTextEdit,
-    QMessageBox,
-    QInputDialog,
+    QVBoxLayout,
 )
-from PyQt6.QtCore import Qt
 
 from storage import PasswordStorage
 
@@ -26,7 +24,7 @@ from storage import PasswordStorage
 class MasterPasswordDialog(QDialog):
     """Dialog for entering the master password."""
 
-    def __init__(self, parent: Optional[QMainWindow] = None):
+    def __init__(self, parent: QMainWindow | None = None):
         super().__init__(parent)
         self.setWindowTitle("Master Password")
         self.setModal(True)
@@ -68,7 +66,7 @@ class MasterPasswordDialog(QDialog):
 class AddPasswordDialog(QDialog):
     """Dialog for adding a new password."""
 
-    def __init__(self, parent: Optional[QMainWindow] = None):
+    def __init__(self, parent: QMainWindow | None = None):
         super().__init__(parent)
         self.setWindowTitle("Add Password")
         self.setModal(True)
@@ -125,7 +123,7 @@ class AddPasswordDialog(QDialog):
 class ViewPasswordDialog(QDialog):
     """Dialog for viewing password details."""
 
-    def __init__(self, service: str, data: dict, parent: Optional[QMainWindow] = None):
+    def __init__(self, service: str, data: dict, parent: QMainWindow | None = None):
         super().__init__(parent)
         self.setWindowTitle(f"Password Details - {service}")
         self.setModal(True)
@@ -147,17 +145,17 @@ class ViewPasswordDialog(QDialog):
         self.password_label = QLabel("********")
         self.password_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         password_layout.addWidget(self.password_label)
-        
+
         self.show_button = QPushButton("Show")
-        self.show_button.clicked.connect(lambda: self._toggle_password(data.get('password', '')))
+        self.show_button.clicked.connect(lambda: self._toggle_password(data.get("password", "")))
         password_layout.addWidget(self.show_button)
         layout.addLayout(password_layout)
 
         # Notes
-        if data.get('notes'):
+        if data.get("notes"):
             layout.addWidget(QLabel("<b>Notes:</b>"))
             notes_display = QTextEdit()
-            notes_display.setPlainText(data['notes'])
+            notes_display.setPlainText(data["notes"])
             notes_display.setReadOnly(True)
             notes_display.setMaximumHeight(100)
             layout.addWidget(notes_display)
@@ -186,7 +184,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.storage: Optional[PasswordStorage] = None
+        self.storage: PasswordStorage | None = None
         self._load_ui()
         self._connect_signals()
         self._initialize_storage()
@@ -230,7 +228,7 @@ class MainWindow(QMainWindow):
                             f"Failed to unlock password manager: {e}\n\n"
                             "If this is your first time, any password will create a new vault.",
                         )
-                    except (OSError, IOError) as e:
+                    except OSError as e:
                         QMessageBox.critical(
                             self,
                             "Error",
@@ -257,11 +255,9 @@ class MainWindow(QMainWindow):
         dialog = AddPasswordDialog(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             service, username, password, notes = dialog.get_data()
-            
+
             if not service or not username or not password:
-                QMessageBox.warning(
-                    self, "Warning", "Service, username, and password are required"
-                )
+                QMessageBox.warning(self, "Warning", "Service, username, and password are required")
                 return
 
             try:
@@ -272,7 +268,7 @@ class MainWindow(QMainWindow):
                 )
             except ValueError as e:
                 QMessageBox.critical(self, "Error", f"Failed to save password: {e}")
-            except (OSError, IOError) as e:
+            except OSError as e:
                 QMessageBox.critical(self, "Error", f"Failed to write password file: {e}")
 
     def _view_password(self) -> None:
@@ -292,7 +288,7 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Warning", f"Password for '{service}' not found")
         except ValueError as e:
             QMessageBox.critical(self, "Error", f"Failed to load password: {e}")
-        except (OSError, IOError) as e:
+        except OSError as e:
             QMessageBox.critical(self, "Error", f"Failed to read password file: {e}")
 
     def _delete_password(self) -> None:
@@ -321,7 +317,7 @@ class MainWindow(QMainWindow):
                     QMessageBox.warning(self, "Warning", f"Password for '{service}' not found")
             except ValueError as e:
                 QMessageBox.critical(self, "Error", f"Failed to delete password: {e}")
-            except (OSError, IOError) as e:
+            except OSError as e:
                 QMessageBox.critical(self, "Error", f"Failed to update password file: {e}")
 
     def _show_about(self) -> None:
@@ -347,14 +343,17 @@ def main() -> None:
         app = QApplication(sys.argv)
         app.setApplicationName("Password Saver")
         app.setOrganizationName("PyQt Password Saver")
-        
+
         window = MainWindow()
         window.show()
-        
+
         sys.exit(app.exec())
     except FileNotFoundError as e:
         print(f"Error: {e}", file=sys.stderr)
-        print("Make sure all required files are present in the installation directory.", file=sys.stderr)
+        print(
+            "Make sure all required files are present in the installation directory.",
+            file=sys.stderr,
+        )
         sys.exit(1)
     except Exception as e:
         print(f"Fatal error: {e}", file=sys.stderr)

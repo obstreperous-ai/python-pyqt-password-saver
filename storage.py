@@ -4,13 +4,13 @@ import base64
 import json
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
+import keyring
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-import keyring
 from keyring.errors import KeyringError
 
 
@@ -19,182 +19,168 @@ class PasswordStorage:
 
     SERVICE_NAME = "PyQtPasswordSaver"
     MASTER_KEY_ID = "master_encryption_key"
-    
-    def __init__(self, data_dir: Optional[Path] = None):
+
+    def __init__(self, data_dir: Path | None = None):
         """Initialize password storage.
-        
+
         Args:
-            data_dir: Directory to store encrypted password file. 
+            data_dir: Directory to store encrypted password file.
                      Defaults to ~/.password_saver/
         """
         if data_dir is None:
             data_dir = Path.home() / ".password_saver"
-        
+
         self.data_dir = data_dir
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.data_file = self.data_dir / "passwords.enc"
-        self._master_key: Optional[bytes] = None
-    
+        self._master_key: bytes | None = None
+
     def initialize_master_key(self, password: str) -> None:
         """Initialize or retrieve the master encryption key.
-        
+
         Args:
             password: Master password to derive encryption key from
         """
         # Try to get existing salt from keyring or fallback to file
         stored_salt = None
         salt_file = self.data_dir / ".salt"
-        
+
         try:
             stored_salt = keyring.get_password(self.SERVICE_NAME, "salt")
         except (KeyringError, RuntimeError):
             # Keyring not available, use file-based storage
             if salt_file.exists():
                 stored_salt = salt_file.read_text()
-        
+
         if stored_salt:
             salt = base64.b64decode(stored_salt)
         else:
             # Generate new salt and store it
             salt = os.urandom(16)
             encoded_salt = base64.b64encode(salt).decode()
-            
+
             try:
                 keyring.set_password(self.SERVICE_NAME, "salt", encoded_salt)
             except (KeyringError, RuntimeError):
                 # Keyring not available, use file-based storage
                 salt_file.write_text(encoded_salt)
-        
+
         # Derive key from password using PBKDF2
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
             salt=salt,
             iterations=100000,
-            backend=default_backend()
+            backend=default_backend(),
         )
         self._master_key = kdf.derive(password.encode())
-    
+
     def _encrypt_data(self, data: bytes) -> bytes:
         """Encrypt data using AES-256-CBC.
-        
+
         Args:
             data: Raw bytes to encrypt
-            
+
         Returns:
             Encrypted bytes with IV prepended
         """
         if self._master_key is None:
             raise ValueError("Master key not initialized")
-        
+
         # Generate random IV
         iv = os.urandom(16)
-        
+
         # Pad data to block size (16 bytes for AES)
         padding_length = 16 - (len(data) % 16)
         padded_data = data + bytes([padding_length] * padding_length)
-        
+
         # Encrypt
-        cipher = Cipher(
-            algorithms.AES(self._master_key),
-            modes.CBC(iv),
-            backend=default_backend()
-        )
+        cipher = Cipher(algorithms.AES(self._master_key), modes.CBC(iv), backend=default_backend())
         encryptor = cipher.encryptor()
         encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
-        
+
         # Prepend IV to encrypted data
         return iv + encrypted_data
-    
+
     def _decrypt_data(self, encrypted_data: bytes) -> bytes:
         """Decrypt AES-256-CBC encrypted data.
-        
+
         Args:
             encrypted_data: Encrypted bytes with IV prepended
-            
+
         Returns:
             Decrypted raw bytes
         """
         if self._master_key is None:
             raise ValueError("Master key not initialized")
-        
+
         # Extract IV and ciphertext
         iv = encrypted_data[:16]
         ciphertext = encrypted_data[16:]
-        
+
         # Decrypt
-        cipher = Cipher(
-            algorithms.AES(self._master_key),
-            modes.CBC(iv),
-            backend=default_backend()
-        )
+        cipher = Cipher(algorithms.AES(self._master_key), modes.CBC(iv), backend=default_backend())
         decryptor = cipher.decryptor()
         padded_data = decryptor.update(ciphertext) + decryptor.finalize()
-        
+
         # Validate and remove padding
         if len(padded_data) == 0:
             raise ValueError("Invalid encrypted data: empty")
-        
+
         padding_length = padded_data[-1]
-        
+
         # Check padding length is valid (1-16 for AES block size)
         if padding_length > 16 or padding_length == 0:
             raise ValueError("Invalid padding")
-        
+
         # Check we have enough bytes for the padding
         if len(padded_data) < padding_length:
             raise ValueError("Invalid padding")
-        
+
         # Verify all padding bytes are correct
         for i in range(padding_length):
             if padded_data[-(i + 1)] != padding_length:
                 raise ValueError("Invalid padding")
-        
+
         data = padded_data[:-padding_length]
-        
+
         return data
-    
+
     def save_passwords(self, passwords: dict[str, dict[str, Any]]) -> None:
         """Save passwords to encrypted file.
-        
+
         Args:
             passwords: Dictionary mapping service names to password data
         """
         # Convert to JSON
         json_data = json.dumps(passwords, indent=2)
-        
+
         # Encrypt and save
         encrypted_data = self._encrypt_data(json_data.encode())
         self.data_file.write_bytes(encrypted_data)
-    
+
     def load_passwords(self) -> dict[str, dict[str, Any]]:
         """Load passwords from encrypted file.
-        
+
         Returns:
             Dictionary mapping service names to password data
         """
         if not self.data_file.exists():
             return {}
-        
+
         try:
             # Load and decrypt
             encrypted_data = self.data_file.read_bytes()
             decrypted_data = self._decrypt_data(encrypted_data)
-            
+
             # Parse JSON
             return json.loads(decrypted_data.decode())
         except (ValueError, json.JSONDecodeError, OSError) as e:
-            raise ValueError(f"Failed to load passwords: {e}")
-    
-    def add_password(
-        self, 
-        service: str, 
-        username: str, 
-        password: str, 
-        notes: str = ""
-    ) -> None:
+            raise ValueError(f"Failed to load passwords: {e}") from e
+
+    def add_password(self, service: str, username: str, password: str, notes: str = "") -> None:
         """Add or update a password entry.
-        
+
         Args:
             service: Service/website name
             username: Username for the service
@@ -202,31 +188,27 @@ class PasswordStorage:
             notes: Optional notes
         """
         passwords = self.load_passwords()
-        passwords[service] = {
-            "username": username,
-            "password": password,
-            "notes": notes
-        }
+        passwords[service] = {"username": username, "password": password, "notes": notes}
         self.save_passwords(passwords)
-    
-    def get_password(self, service: str) -> Optional[dict[str, Any]]:
+
+    def get_password(self, service: str) -> dict[str, Any] | None:
         """Retrieve password entry for a service.
-        
+
         Args:
             service: Service/website name
-            
+
         Returns:
             Dictionary with username, password, and notes, or None if not found
         """
         passwords = self.load_passwords()
         return passwords.get(service)
-    
+
     def delete_password(self, service: str) -> bool:
         """Delete a password entry.
-        
+
         Args:
             service: Service/website name
-            
+
         Returns:
             True if deleted, False if not found
         """
@@ -236,10 +218,10 @@ class PasswordStorage:
             self.save_passwords(passwords)
             return True
         return False
-    
+
     def list_services(self) -> list[str]:
         """Get list of all stored services.
-        
+
         Returns:
             List of service names
         """
