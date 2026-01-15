@@ -127,7 +127,7 @@ This project uses GitHub Actions for continuous integration and deployment:
 
 #### Release (`release.yml`)
 - Triggers on: Version tags (e.g., `v0.1.1`)
-- Creates: 
+- Creates:
   - Python packages (wheel and source)
   - Platform-specific binaries (macOS, Linux)
   - GitHub Release with all artifacts
@@ -139,4 +139,3 @@ MIT License - see LICENSE file for details
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
