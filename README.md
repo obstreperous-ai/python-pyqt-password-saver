@@ -90,9 +90,67 @@ python-pyqt-password-saver/
 ### Configuration
 
 Project uses `pyproject.toml` for configuration with support for:
-- Black code formatter
-- Ruff linter
-- mypy type checker
+- Black code formatter (line-length: 100)
+- Ruff linter (Python 3.12 target)
+- mypy type checker (strict settings)
+- Pylint (comprehensive code quality checks)
+- Bandit (security linter)
+
+### Setting Up Development Environment
+
+1. Install the package with development dependencies:
+```bash
+pip install -e ".[dev]"
+```
+
+2. Install pre-commit hooks:
+```bash
+pre-commit install
+```
+
+This will automatically run code quality checks before each commit.
+
+### Code Quality Tools
+
+#### Pre-commit Hooks
+
+Pre-commit hooks are configured in `.pre-commit-config.yaml` and automatically run on each commit:
+
+- **black**: Code formatting
+- **ruff**: Fast linting with auto-fix
+- **pylint**: Comprehensive code quality checks
+- **mypy**: Type checking
+- **bandit**: Security scanning
+- **detect-secrets**: Credential detection
+- **Standard hooks**: Whitespace, YAML/TOML validation, large files
+
+Run manually on all files:
+```bash
+pre-commit run --all-files
+```
+
+#### Manual Testing
+
+Run individual tools:
+```bash
+# Format code with Black
+black .
+
+# Lint with Ruff
+ruff check .
+
+# Comprehensive linting with Pylint
+pylint --rcfile=pyproject.toml .
+
+# Type checking with MyPy
+mypy --config-file=pyproject.toml .
+
+# Security scanning
+bandit -r . -c pyproject.toml
+
+# Check for dependency vulnerabilities
+pip-audit --desc -r requirements.txt
+```
 
 ### Dependencies
 
@@ -117,17 +175,27 @@ This project uses GitHub Actions for continuous integration and deployment:
 
 #### Code Quality (`code-quality.yml`)
 - Runs on: Push and Pull Requests
-- Tools: Black, Ruff, Pylint, MyPy, Bandit
-- Ensures code formatting, quality, and type safety
+- Tools:
+  - **Black**: Code formatting validation
+  - **Ruff**: Fast Python linting
+  - **Pylint**: Comprehensive code quality checks
+  - **MyPy**: Type checking
+  - **Bandit**: Security linting
+  - **pre-commit**: Runs all configured hooks
+- Ensures code formatting, quality, type safety, and basic security
 
 #### Security Scanning (`security.yml`)
 - Runs on: Push, Pull Requests, and weekly schedule
-- Tools: pip-audit, Bandit, detect-secrets
-- Checks for vulnerabilities and security issues
+- Tools:
+  - **pip-audit**: Scans dependencies for known vulnerabilities (CVEs)
+  - **Bandit**: Static security analysis for Python code
+  - **detect-secrets**: Prevents committing secrets/credentials
+- Generates JSON reports uploaded as artifacts
+- Checks for vulnerabilities and security issues in code and dependencies
 
 #### Release (`release.yml`)
 - Triggers on: Version tags (e.g., `v0.1.1`)
-- Creates: 
+- Creates:
   - Python packages (wheel and source)
   - Platform-specific binaries (macOS, Linux)
   - GitHub Release with all artifacts
@@ -139,4 +207,3 @@ MIT License - see LICENSE file for details
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-

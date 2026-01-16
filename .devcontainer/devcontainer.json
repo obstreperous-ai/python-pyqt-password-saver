@@ -1,7 +1,7 @@
 {
   "name": "Python PyQt Password Saver",
   "image": "mcr.microsoft.com/devcontainers/python:3.12",
-  
+
   // Features to add to the dev container
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
@@ -31,7 +31,7 @@
           "editor.insertSpaces": true
         }
       },
-      
+
       // Add the IDs of extensions you want installed when the container is created
       "extensions": [
         "ms-python.python",
@@ -57,7 +57,7 @@
   // Note: QT_QPA_PLATFORM=offscreen allows PyQt apps to run in headless mode without display
   // This is suitable for development, testing, and running the app programmatically
   // To view the GUI during development:
-  //   1. Change "offscreen" to "xcb" 
+  //   1. Change "offscreen" to "xcb"
   //   2. Add "DISPLAY": ":0" to remoteEnv
   //   3. Ensure X11 forwarding is configured on your host
   "remoteEnv": {

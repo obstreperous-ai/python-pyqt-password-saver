@@ -16,29 +16,29 @@ jobs:
   security:
     name: Security Audit
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
         cache: 'pip'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pip-audit
-    
+        pip install -e ".[dev]"
+
     - name: Run pip-audit (vulnerability scan)
       run: |
         pip-audit --desc | tee pip-audit-output.txt
         pip-audit --desc --format json -o pip-audit-report.json
       continue-on-error: true
-    
+
     - name: Upload pip-audit report
       if: always()
       uses: actions/upload-artifact@v4
@@ -46,14 +46,13 @@ jobs:
         name: pip-audit-report
         path: pip-audit-report.json
         retention-days: 30
-    
+
     - name: Run Bandit (security linter)
       run: |
-        pip install bandit
-        bandit -r . | tee bandit-output.txt
-        bandit -r . -f json -o bandit-report.json
+        bandit -r . -c pyproject.toml | tee bandit-output.txt
+        bandit -r . -c pyproject.toml -f json -o bandit-report.json
       continue-on-error: true
-    
+
     - name: Upload Bandit report
       if: always()
       uses: actions/upload-artifact@v4
@@ -61,7 +60,7 @@ jobs:
         name: bandit-report
         path: bandit-report.json
         retention-days: 30
-    
+
     - name: Check for hardcoded secrets
       run: |
         pip install detect-secrets
