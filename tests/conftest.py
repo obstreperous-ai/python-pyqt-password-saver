@@ -2,13 +2,15 @@
 
 import shutil
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 
 @pytest.fixture
-def temp_dir():
+def temp_dir() -> Iterator[Path]:
     """Create a temporary directory for testing."""
     temp_path = Path(tempfile.mkdtemp())
     yield temp_path
@@ -18,13 +20,13 @@ def temp_dir():
 
 
 @pytest.fixture
-def master_password():
+def master_password() -> str:
     """Provide a test master password."""
     return "test_master_password_123"
 
 
 @pytest.fixture
-def sample_passwords():
+def sample_passwords() -> dict[str, dict[str, Any]]:
     """Provide sample password data for testing."""
     return {
         "github.com": {
