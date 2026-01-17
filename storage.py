@@ -4,7 +4,7 @@ import base64
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import keyring
 from cryptography.hazmat.backends import default_backend
@@ -174,7 +174,7 @@ class PasswordStorage:
             decrypted_data = self._decrypt_data(encrypted_data)
 
             # Parse JSON
-            return json.loads(decrypted_data.decode())
+            return cast(dict[str, dict[str, Any]], json.loads(decrypted_data.decode()))
         except (ValueError, json.JSONDecodeError, OSError) as e:
             raise ValueError(f"Failed to load passwords: {e}") from e
 

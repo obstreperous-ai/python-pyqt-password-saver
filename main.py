@@ -28,7 +28,7 @@ class MasterPasswordDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Master Password")
         self.setModal(True)
-        self.password = ""
+        self.password = ""  # nosec B105
         self._setup_ui()
 
     def _setup_ui(self) -> None:
@@ -182,7 +182,7 @@ class ViewPasswordDialog(QDialog):
 class MainWindow(QMainWindow):
     """Main application window."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.storage: PasswordStorage | None = None
         self._load_ui()
