@@ -35,8 +35,11 @@ pre-commit install
 
 ### Running the Application
 ```bash
-# Run the password manager GUI
+# Run the password manager GUI (development)
 python main.py
+
+# Or use the installed command (after pip install)
+password-saver
 ```
 
 ### Code Quality and Linting
@@ -71,6 +74,9 @@ detect-secrets scan --baseline .secrets.baseline
 
 ### Testing
 ```bash
+# Note: pytest tests are not yet implemented in the repository
+# When tests are added, use these commands:
+
 # Run tests with pytest (Linux with display server)
 xvfb-run -a pytest -v --tb=short
 
@@ -285,6 +291,9 @@ def test_password_storage_initialization():
 - `pre-commit>=3.5.0` - Pre-commit hooks
 - `bandit[toml]>=1.7.5` - Security scanner
 - `pip-audit>=2.6.0` - Dependency vulnerability scanner
+- `pytest>=7.0.0` - Testing framework (for future test implementation)
+- `pytest-qt` - PyQt6 testing support (for future test implementation)
+- `pytest-xvfb` - Headless testing on Linux (for future test implementation)
 
 ### Adding New Dependencies
 1. Check for vulnerabilities: `pip-audit` on the new package
