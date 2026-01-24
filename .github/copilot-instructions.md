@@ -333,10 +333,15 @@ class PasswordStrengthWidget(QWidget):
         self._color = "red"
         
     def set_password(self, password: str) -> None:
+        # Check password strength based on multiple criteria
+        has_upper = any(c.isupper() for c in password)
+        has_digit = any(c.isdigit() for c in password)
+        has_special = any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in password)
+        
         if len(password) < 8:
             self._strength = "weak"
             self._color = "red"
-        elif any(c.isupper() for c in password) and any(c.isdigit() for c in password):
+        elif has_upper and has_digit and has_special:
             self._strength = "strong"
             self._color = "green"
         else:
@@ -398,7 +403,13 @@ xvfb-run -a pytest tests/test_export.py -v
 ```python
 # storage.py
 def export_to_json(self, export_file: Path) -> None:
-    """Export passwords to JSON file."""
+    """Export passwords to JSON file.
+    
+    WARNING: This exports passwords in PLAIN TEXT. The exported file
+    is not encrypted and should be handled with extreme caution.
+    Only use this for backup purposes and delete the file immediately
+    after importing to a secure location.
+    """
     passwords = self.load_passwords()
     with open(export_file, 'w') as f:
         json.dump(passwords, f, indent=2)
@@ -769,7 +780,7 @@ If you encounter:
 python -m py_compile main.py storage.py
 
 # Check pyproject.toml is valid
-python -c "import tomllib; tomllib.load(open('pyproject.toml', 'rb'))"
+python -c "import tomllib; with open('pyproject.toml', 'rb') as f: tomllib.load(f)"
 
 # Ensure all dependencies are installed
 pip install -r requirements.txt
