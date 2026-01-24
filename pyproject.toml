@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "A cross-platform desktop password saver application using PyQt6"
 readme = "README.md"
 requires-python = ">=3.12"
-license = {file = "LICENSE"}
+license = "Apache-2.0"
 keywords = ["password", "manager", "pyqt6", "encryption", "security"]
 authors = [
     {name = "PyQt Password Saver Team"}
@@ -12,7 +12,6 @@ authors = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Operating System :: MacOS",
@@ -35,14 +34,25 @@ dev = [
     "pre-commit>=3.5.0",
     "bandit[toml]>=1.7.5",
     "pip-audit>=2.6.0",
+    "pytest>=7.0.0",
+    "pytest-qt>=4.0.0",
+    "pytest-xvfb>=3.0.0",
+    "pytest-cov>=4.0.0",
+    "build>=1.0.0",
 ]
 
 [project.scripts]
-password-saver = "main:main"
+password-saver = "password_saver.main:main"
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["password_saver"]
+
+[tool.setuptools.package-data]
+password_saver = ["ui/*.ui"]
 
 [tool.black]
 line-length = 100
@@ -65,9 +75,10 @@ python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+exclude = ["build/", "dist/", "\\.eggs/", ".*\\.egg-info/"]
 
 [[tool.mypy.overrides]]
-module = "main"
+module = "password_saver.main"
 disable_error_code = ["attr-defined"]
 
 [tool.pylint.main]
@@ -102,3 +113,31 @@ ignored-modules = ["PyQt6", "PyQt6.QtCore", "PyQt6.QtWidgets", "PyQt6.QtGui"]
 [tool.bandit]
 exclude_dirs = ["/tmp", "tests", ".venv", "venv"]
 skips = ["B101"]  # Skip assert_used in test files
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
+
+[tool.coverage.run]
+source = ["password_saver"]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

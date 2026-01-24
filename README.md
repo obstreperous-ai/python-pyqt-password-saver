@@ -66,14 +66,20 @@ On first launch, you'll be prompted to create a master password. This password w
 
 ```
 python-pyqt-password-saver/
-├── main.py              # Application entry point and GUI logic
-├── storage.py           # Encrypted storage and cryptography logic
-├── ui/
-│   └── mainwindow.ui   # PyQt6 UI definition file
-├── requirements.txt     # Python dependencies
-├── pyproject.toml      # Project configuration and metadata
-├── README.md           # This file
-└── LICENSE             # MIT License
+├── password_saver/          # Main package directory
+│   ├── __init__.py         # Package initialization
+│   ├── main.py             # Application entry point and GUI logic
+│   ├── storage.py          # Encrypted storage and cryptography logic
+│   └── ui/
+│       └── mainwindow.ui   # PyQt6 UI definition file
+├── tests/                   # Test suite
+│   ├── conftest.py         # Pytest fixtures and configuration
+│   ├── test_main.py        # Tests for main module
+│   └── test_storage.py     # Tests for storage module
+├── requirements.txt         # Python dependencies
+├── pyproject.toml          # Project configuration and metadata
+├── README.md               # This file
+└── LICENSE                 # Apache 2.0 License
 ```
 
 ## Security
@@ -152,13 +158,31 @@ bandit -r . -c pyproject.toml
 pip-audit --desc -r requirements.txt
 ```
 
+### Testing
+
+Run tests with pytest:
+```bash
+# Run all tests (Linux with display server)
+xvfb-run -a pytest -v --tb=short
+
+# Run all tests (macOS)
+pytest -v --tb=short
+
+# Run tests with coverage report
+xvfb-run -a pytest --cov=password_saver --cov-report=term --cov-report=html
+
+# View coverage report
+# Open htmlcov/index.html in a browser
+```
+
+Current test coverage: **97% for storage module**, **63% overall** (GUI testing is limited)
+
 ### Dependencies
 
 Core dependencies:
 - `PyQt6>=6.6.0` - GUI framework
 - `cryptography>=41.0.0` - Encryption library
 - `keyring>=24.0.0` - OS keyring integration
-- `PySide6>=6.6.0` - Optional fallback UI framework
 
 ### CI/CD Workflows
 
@@ -202,7 +226,7 @@ This project uses GitHub Actions for continuous integration and deployment:
 
 ## License
 
-MIT License - see LICENSE file for details
+Apache License 2.0 - see LICENSE file for details
 
 ## Contributing
 
