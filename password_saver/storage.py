@@ -19,6 +19,7 @@ class PasswordStorage:
 
     SERVICE_NAME = "PyQtPasswordSaver"
     MASTER_KEY_ID = "master_encryption_key"
+    DEFAULT_DATA_DIR = ".password_saver"
 
     def __init__(self, data_dir: Path | None = None):
         """Initialize password storage.
@@ -28,7 +29,7 @@ class PasswordStorage:
                      Defaults to ~/.password_saver/
         """
         if data_dir is None:
-            data_dir = Path.home() / ".password_saver"
+            data_dir = Path.home() / self.DEFAULT_DATA_DIR
 
         self.data_dir = data_dir
         self.data_dir.mkdir(parents=True, exist_ok=True)
