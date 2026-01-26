@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from storage import PasswordStorage
+from password_saver.storage import PasswordStorage
 
 
 class TestPasswordStorage:

@@ -74,8 +74,8 @@ jobs:
         pyinstaller --name PasswordSaver \
           --windowed \
           --onedir \
-          --add-data "ui:ui" \
-          main.py
+          --add-data "password_saver/ui:password_saver/ui" \
+          password_saver/main.py
 
     - name: Create DMG (if possible)
       run: |
@@ -131,8 +131,8 @@ jobs:
       run: |
         pyinstaller --name PasswordSaver \
           --onefile \
-          --add-data "ui:ui" \
-          main.py
+          --add-data "password_saver/ui:password_saver/ui" \
+          password_saver/main.py
 
     - name: Create Linux archive
       run: |

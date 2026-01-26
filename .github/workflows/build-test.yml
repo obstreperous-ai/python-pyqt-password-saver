@@ -75,13 +75,13 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         xvfb-run -a python -c "import sys; from PyQt6.QtWidgets import QApplication; app = QApplication(sys.argv); print('QApplication created successfully')"
-        xvfb-run -a python -c "from storage import PasswordStorage; print('PasswordStorage imported successfully')"
-        xvfb-run -a python -c "from main import MasterPasswordDialog; print('MasterPasswordDialog imported successfully')"
+        xvfb-run -a python -c "from password_saver.storage import PasswordStorage; print('PasswordStorage imported successfully')"
+        xvfb-run -a python -c "from password_saver.main import MasterPasswordDialog; print('MasterPasswordDialog imported successfully')"
 
     - name: Test imports (macOS)
       if: runner.os == 'macOS'
       run: |
-        python -c "from storage import PasswordStorage; print('PasswordStorage imported successfully')"
+        python -c "from password_saver.storage import PasswordStorage; print('PasswordStorage imported successfully')"
         python -c "import sys; from PyQt6.QtWidgets import QApplication; app = QApplication(sys.argv); print('QApplication created successfully')"
 
     - name: Run tests with pytest (Linux)
