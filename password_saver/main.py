@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+from typing import cast
 
 from PyQt6 import uic
 from PyQt6.QtCore import Qt
@@ -28,7 +29,7 @@ class MasterPasswordDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Master Password")
         self.setModal(True)
-        self.password = ""  # nosec B105
+        self.password = ""  # nosec B105  # pragma: allowlist secret
         self._setup_ui()
 
     def _setup_ui(self) -> None:
@@ -60,7 +61,7 @@ class MasterPasswordDialog(QDialog):
 
     def get_password(self) -> str:
         """Get the entered password."""
-        return self.password_input.text()
+        return cast(str, self.password_input.text())
 
 
 class AddPasswordDialog(QDialog):
