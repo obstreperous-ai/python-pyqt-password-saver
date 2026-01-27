@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture()
 def temp_dir() -> Iterator[Path]:
     """Create a temporary directory for testing."""
     temp_path = Path(tempfile.mkdtemp())
@@ -19,13 +19,13 @@ def temp_dir() -> Iterator[Path]:
         shutil.rmtree(temp_path)
 
 
-@pytest.fixture
+@pytest.fixture()
 def master_password() -> str:
     """Provide a test master password."""
     return "test_master_password_123"
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_passwords() -> dict[str, dict[str, Any]]:
     """Provide sample password data for testing."""
     return {

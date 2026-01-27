@@ -101,7 +101,7 @@ class PasswordStorage:
         encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
 
         # Prepend IV to encrypted data
-        return iv + encrypted_data
+        return cast(bytes, iv + encrypted_data)
 
     def _decrypt_data(self, encrypted_data: bytes) -> bytes:
         """Decrypt AES-256-CBC encrypted data.
@@ -145,7 +145,7 @@ class PasswordStorage:
 
         data = padded_data[:-padding_length]
 
-        return data
+        return cast(bytes, data)
 
     def save_passwords(self, passwords: dict[str, dict[str, Any]]) -> None:
         """Save passwords to encrypted file.

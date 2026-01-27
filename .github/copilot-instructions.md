@@ -300,7 +300,7 @@ def test_password_strength_weak(qtbot):
     """Test that weak password shows red indicator."""
     widget = PasswordStrengthWidget()
     qtbot.addWidget(widget)
-    
+
     widget.set_password("123")
     assert widget.get_strength() == "weak"
     assert widget.get_color() == "red"
@@ -309,7 +309,7 @@ def test_password_strength_strong(qtbot):
     """Test that strong password shows green indicator."""
     widget = PasswordStrengthWidget()
     qtbot.addWidget(widget)
-    
+
     widget.set_password("MyStr0ng!P@ssw0rd")
     assert widget.get_strength() == "strong"
     assert widget.get_color() == "green"
@@ -331,13 +331,13 @@ class PasswordStrengthWidget(QWidget):
         super().__init__()
         self._strength = "weak"
         self._color = "red"
-        
+
     def set_password(self, password: str) -> None:
         # Check password strength based on multiple criteria
         has_upper = any(c.isupper() for c in password)
         has_digit = any(c.isdigit() for c in password)
         has_special = any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in password)
-        
+
         if len(password) < 8:
             self._strength = "weak"
             self._color = "red"
@@ -347,10 +347,10 @@ class PasswordStrengthWidget(QWidget):
         else:
             self._strength = "medium"
             self._color = "yellow"
-    
+
     def get_strength(self) -> str:
         return self._strength
-    
+
     def get_color(self) -> str:
         return self._color
 ```
@@ -382,10 +382,10 @@ def test_export_passwords_to_json(temp_dir, master_password):
     storage = PasswordStorage(data_dir=temp_dir)
     storage.initialize_master_key(master_password)
     storage.add_password("test.com", "user", "pass", "notes")
-    
+
     export_file = temp_dir / "export.json"
     storage.export_to_json(export_file)
-    
+
     assert export_file.exists()
     with open(export_file) as f:
         data = json.load(f)
@@ -404,7 +404,7 @@ xvfb-run -a pytest tests/test_export.py -v
 # storage.py
 def export_to_json(self, export_file: Path) -> None:
     """Export passwords to JSON file.
-    
+
     WARNING: This exports passwords in PLAIN TEXT. The exported file
     is not encrypted and should be handled with extreme caution.
     Only use this for backup purposes and delete the file immediately
